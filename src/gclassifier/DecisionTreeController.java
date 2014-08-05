@@ -1022,8 +1022,11 @@ public class DecisionTreeController implements TreeQualifier {
         try {
             BufferedReader br = new BufferedReader(new FileReader(filePPI));
 
+//            int count =0;
             while (br.ready()) {
                 String X = br.readLine();
+//                if(count++ % 10 != 0)
+//                	continue;
                 String[] Y = X.split("\t");
 
                 String A = Y[0].trim();

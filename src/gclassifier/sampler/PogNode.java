@@ -314,15 +314,19 @@ public class PogNode {
     	
     	int count = 0;
     	double sum = 0;
+    	ArrayList<Integer> nodeArrayList = new ArrayList<Integer>();
+    	for (Node n : nodeList) {
+    		nodeArrayList.add(n.id);
+    	}
     	for (Node n: addableList) {
-    		int visitCount = getVisitCount(nodeList, n);
+    		int visitCount = getVisitCount(nodeArrayList, n, true);
     		addWeight[count] = visitCount*addWeight[count];
     		sum += addWeight[count];
     		count++;
     	}
     	count=0;
     	for (Node n: removableList) {
-    		int visitCount = getVisitCount(nodeList, n);
+    		int visitCount = getVisitCount(nodeArrayList, n, false);
     		removeWeight[count] = visitCount*removeWeight[count];
     		sum += removeWeight[count];
     		count++;
@@ -334,18 +338,23 @@ public class PogNode {
     		removeWeight[i] /= sum;
     	}
     }
-    private int getVisitCount(Set<Node> nodeList2, Node n) {
+    private int getVisitCount(ArrayList<Integer> nodeArrayList, Node n, boolean add) {
 		// TODO Auto-generated method stub
-    	ArrayList<Integer> nodeArrayList = new ArrayList<Integer>();
-		for (Node n_iter : nodeList2) {
-			nodeArrayList.add(n_iter.id);
-		}
-		if (n != null)
-			nodeArrayList.add(n.id);
+    	if (n != null)
+			if(add)
+				nodeArrayList.add(n.id);
+			else
+				nodeArrayList.remove((Integer)n.id);
 		Collections.sort(nodeArrayList);
 		if (MetroSampler.visit_count.containsKey(nodeArrayList)) {
 			return MetroSampler.visit_count.get(nodeArrayList);
 		}
+		if (n != null)
+			if(!add)
+				nodeArrayList.add(n.id);
+			else
+				nodeArrayList.remove((Integer)n.id);
+		
 		return 1;
 	}
 
@@ -920,51 +929,67 @@ public class PogNode {
     	double outerSum = 0;
     	double transitProb = 0;
     	double avgNr = 0;
-    	System.out.println("Avg size starting "+avgNr);
+//    	HashMap<Integer, Integer> addAddnodeMap = new HashMap<Integer, Integer>();
+//    	HashMap<Integer, Integer> addRemovenodeMap = new HashMap<Integer, Integer>();
+//    	HashMap<Integer, Integer> removeAddnodeMap = new HashMap<Integer, Integer>();
+//    	HashMap<Integer, Integer> removeRemovenodeMap = new HashMap<Integer, Integer>();
+    	//System.out.println("Avg size starting "+avgNr);
+//    	int count=0;
+//    	boolean nothingAdded = true;
     	for (Node n: p.addableList) {
-    		
+//    		if(p.addWeight[count++] < 0.01) {
+//    			continue;
+//    			
+//    		}
+//    		nothingAdded = false;
     		PogNode pn = p.recalcInfoAddedDivRank(n, qualifier);
-    		avgNr += pn.addableList.size();
-    		avgNr += pn.removableList.size();
-    		double innerSum =0;
+//    		avgNr += pn.addableList.size();
+//    		avgNr += pn.removableList.size();
+//    		double innerSum =0;
     		double wt = getPotential(pn);
-    		int i=0;
-    		for(Node pnn : pn.addableList) {
-    			innerSum += pn.addWeight[i]* getVisitCount(pn,pnn);
-    			i++;
-        	}
-    		i=0;
-    		for(Node pnn : pn.removableList) {
-    			innerSum += pn.removeWeight[i]* getVisitCount(pn,pnn);
-    			i++;
-        	}
+//    		int i=0;
+//    		for(Node pnn : pn.addableList) {
+//    			addAddnodeMap.put(pnn.id, 0);
+//    			innerSum += pn.addWeight[i]; //* getVisitCount(pn,pnn);
+//    			i++;
+//        	}
+//    		i=0;
+//    		for(Node pnn : pn.removableList) {
+//    			addRemovenodeMap.put(pnn.id, 0);
+//    			innerSum += pn.removeWeight[i]* getVisitCount(pn,pnn);
+//    			i++;
+//        	}
 			transitProb = pn.getTransitProb(p);
     		//qualifier.reverseChange();
-    		outerSum += (transitProb*wt) / innerSum;
+    		outerSum += (transitProb*wt);
     	}
-    	
     	for (Node n: p.removableList) {
     		
     		PogNode pn = p.recalcInfoRemovedDivRank(n, qualifier);
-    		avgNr += pn.addableList.size();
-    		avgNr += pn.removableList.size();
-    		double innerSum =0;
+//    		avgNr += pn.addableList.size();
+//    		avgNr += pn.removableList.size();
+//    		double innerSum =0;
     		double wt = getPotential(pn);
-    		int i=0;
-    		for(Node pnn : pn.addableList) {
-    			innerSum += pn.addWeight[i]* getVisitCount(pn,pnn);
-    			i++;
-        	}
-    		i=0;
-    		for(Node pnn : pn.removableList) {
-    			innerSum += pn.removeWeight[i]* getVisitCount(pn,pnn);
-    			i++;
-        	}
+//    		int i=0;
+//    		for(Node pnn : pn.addableList) {
+//    			removeAddnodeMap.put(pnn.id, 0);
+//    			innerSum += pn.addWeight[i]* getVisitCount(pn,pnn);
+//    			i++;
+//        	}
+//    		i=0;
+//    		for(Node pnn : pn.removableList) {
+//    			removeRemovenodeMap.put(pnn.id, 0);
+//    			innerSum += pn.removeWeight[i]* getVisitCount(pn,pnn);
+//    			i++;
+//        	}
+//			System.out.println(innerSum + "inner sum");
 			transitProb = pn.getTransitProb(p);
     		//qualifier.reverseChange();
-    		outerSum += (transitProb*wt) / innerSum;
+    		outerSum += (transitProb*wt);
     	}
-    	System.out.println("Avg size is "+avgNr);
+    	System.out.println(" Avg size is "+avgNr);
+//    	System.out.println( addAddnodeMap.size() +" " + addRemovenodeMap.size()
+//    			+" " +removeAddnodeMap.size()+" " +removeRemovenodeMap.size());
     	outerSum *= getVisitCount(p, null);
     	p.updatePotential(outerSum);
     	return p;

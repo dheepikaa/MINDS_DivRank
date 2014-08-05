@@ -303,7 +303,7 @@ public class Tree {
 
     private void checkUnclassified(Set<Integer> sampleList) {
 		// TODO Auto-generated method stub
-		if(unclassified.isEmpty()) {
+		if((unclassified.size()+0.0)/sampleList.size() < 0.01) {
 			unclassified.addAll(sampleList);
 		}
 	}
